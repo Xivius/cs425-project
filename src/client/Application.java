@@ -69,6 +69,7 @@ public class Application {
                 }
             }
             
+            
             // Prepared statements that we might need.
             PreparedStatement createNewEmployee = conn.prepareStatement(
                 "insert into Login (EmployeeID, Password, Privilege) values (?, ?,?)"
@@ -96,12 +97,21 @@ public class Application {
                 );
             
             
+            // Other statements
+            String selectLogin = "select * from Login";
+            String selectEmployee = "select * from Employee";
+            String selectInventory = "slect * from Inventory";
+            String selectCustomer = "slect * from Customer";
+            String selectModel = "slect * from Model";
+            String selectOrder = "slect * from Order";
+            
+            
             // Create while loops for each privilege (type of user):
             if (privilege == "admin"){
                 while (true) {
                     System.out.println("What would you like to do? (Type number) Options:");
                     System.out.println("(1) Create a new Employee");
-                    System.out.println("(2) Update a table");
+                    System.out.println("(2) View/Update a table");
                     System.out.println("(3) Grant access to an Employee");
                     System.out.println("(4) Business analytics");
                     System.out.println("(5) Logout");
@@ -111,7 +121,73 @@ public class Application {
                     if (userInput == "5"){
                         break;
                     } else if (userInput == "4"){
-                        // FIXME: Need to write the code for each action
+                        
+                    } else if (userInput == "3"){
+                        
+                    } else if (userInput == "2"){
+                        // User names a table, and it is printed.
+                        // Then, the user may enter some SQL to update any table.
+                        
+                        System.out.println("Enter table name:");
+                        String tname = scan.nextLine();
+                        
+                        ResultSet rset = null;
+                        switch(tname){
+                            case "Login":
+                                rset = stmt.executeQuery(selectLogin);
+                                while (rset.next()){
+                                    System.out.println(rset.getString(1)+" "+rset.getString(2)+" "+rset.getString(3)+" "+rset.getString(4));
+                                }
+                                break;
+                            case "Employee":
+                                rset = stmt.executeQuery(selectEmployee);
+                                while (rset.next()){
+                                    System.out.println(rset.getString(1)+" "+rset.getString(2)+" "+rset.getString(3)+" "+rset.getString(4)+rset.getString(5)+" "+rset.getString(6)+" "+rset.getString(7));
+                                }
+                                break;
+                            case "Inventory":
+                                rset = stmt.executeQuery(selectInventory);
+                                while (rset.next()){
+                                    System.out.println(rset.getString(1)+" "+rset.getString(2)+" "+rset.getString(3)+" "+rset.getString(4)+rset.getString(5));
+                                }
+                                break;
+                            case "Customer":
+                                rset = stmt.executeQuery(selectCustomer);
+                                while (rset.next()){
+                                    System.out.println(rset.getString(1)+" "+rset.getString(2)+" "+rset.getString(3));
+                                }
+                                break;
+                            case "Model":
+                                rset = stmt.executeQuery(selectModel);
+                                while (rset.next()){
+                                    System.out.println(rset.getString(1)+" "+rset.getString(2));
+                                }
+                                break;
+                            case "Order":
+                                rset = stmt.executeQuery(selectOrder);
+                                while (rset.next()){
+                                    System.out.println(rset.getString(1)+" "+rset.getString(2)+" "+rset.getString(3)+" "+rset.getString(4)+rset.getString(5)+" "+rset.getString(6));
+                                }
+                                break;
+                            default:
+                                System.out.println("No option selected");
+                        }
+                        
+                        // Keep asking for update statements until user enters "".
+                        while (true) {
+                            System.out.println("Input update SQL statement. Press ENTER (empty string) to stop.");
+                            String admin_statement = scan.nextLine();
+                            if (admin_statement.isEmpty()) {
+                                break;
+                            }
+                            stmt.executeUpdate(admin_statement);
+                            
+                        }
+                        
+                        
+                        
+                    } else if (userInput == "1"){
+                        
                     }
                     
                     
