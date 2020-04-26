@@ -121,8 +121,17 @@ public class Application {
                     if (userInput == "5"){
                         break;
                     } else if (userInput == "4"){
-                        
+                        // FIXME: analytics
                     } else if (userInput == "3"){
+                        // Ask for EmployeeID, and the permission, plug those values into the grantRole prepared statement, then exectue.
+                        System.out.println("Enter EmployeeID of person to grant:");
+                        String employeeGrant = scan.nextLine();
+                        System.out.println("Enter privilege to grant to the EmployeeID (Admin, HR, Sales, Engineering):");
+                        String employeePrivilege = scan.nextLine();
+                        
+                        grantRoleToEmployee.setString(1, employeePrivilege);
+                        grantRoleToEmployee.setString(2, employeeGrant);
+                        grantRoleToEmployee.executeUpdate();
                         
                     } else if (userInput == "2"){
                         // User names a table, and it is printed.
