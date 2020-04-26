@@ -69,6 +69,32 @@ public class Application {
                 }
             }
             
+            // Prepared statements that we might need.
+            PreparedStatement createNewEmployee = conn.prepareStatement(
+                "insert into Login (EmployeeID, Password, Privilege) values (?, ?,?)"
+                );
+            PreparedStatement insertIntoEmployee = conn.prepareStatement(
+                "insert into Employee (EmployeeID, FirstName, LastName, SSN, Salary, PayType, JobType) values (?,?,?,?,?,?,?)"
+                );
+            PreparedStatement insertIntoInventory = conn.prepareStatement(
+                "insert into Inventory (ItemID, Cost, LeadTime, CategoryType, CategoryNumber) values (?,?,?,?,?)"
+                );
+            PreparedStatement insertIntoCustomer = conn.prepareStatement(
+                "insert into Customer (CustomerID, FirstName, LastName) values (?,?,?)"
+                );
+            PreparedStatement insertIntoModel = conn.prepareStatement(
+                "insert into Model (ModelNumber, SalesPrice) values (?,?)"
+                );
+            PreparedStatement insertIntoOrder = conn.prepareStatement(
+                "insert into Order (OrderNumber, CustomerID, EmployeeID, SalesValue) values (?,?,?,?)"
+                );
+            PreparedStatement grantRoleToEmployee = conn.prepareStatement(
+                "grant ? to ?"
+                );
+            PreparedStatement createOrder = conn.prepareStatement(
+                "insert into Order (OrderNumber, CustomerID, EmployeeId, SalesValue, ItemID, ModelNumber) values (?,?,?,?,?,?)"
+                );
+            
             
             // Create while loops for each privilege (type of user):
             if (privilege == "admin"){
