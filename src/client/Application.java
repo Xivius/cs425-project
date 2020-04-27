@@ -10,7 +10,7 @@
  */
 
 package client;
- 
+
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.Scanner;
@@ -198,7 +198,7 @@ public class Application {
                         
                         
                     } else if (userInput.equals("1")) {
-                    	System.out.println("User Type: ");
+                        System.out.println("User Type: ");
                         System.out.println("(1) Admin");
                         System.out.println("(2) Sales");
                         System.out.println("(3) Engineer");
@@ -208,10 +208,10 @@ public class Application {
                         String firstName, lastName, payType, jobType, newPass;
                         BigDecimal salary = null;
                         int employeeID, SSN;
-                    	System.out.print("Employee ID: ");
-                    	employeeID = scan.nextInt();
+                        System.out.print("Employee ID: ");
+                        employeeID = scan.nextInt();
                         System.out.print("First Name: ");
-                    	firstName = scan.nextLine();
+                        firstName = scan.nextLine();
                         System.out.print("Last Name: ");
                         lastName = scan.nextLine();
                         System.out.print("SSN: ");
