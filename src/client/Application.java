@@ -73,7 +73,7 @@ public class Application {
             
             // Prepared statements that we might need.
             PreparedStatement createNewEmployee = conn.prepareStatement(
-                "insert into Login (EmployeeID, Password, Privilege) values (?, ?,?)"
+                "insert into Login (UserID, Password, Privilege) values (?,?,?)"
                 );
             PreparedStatement insertIntoEmployee = conn.prepareStatement(
                 "insert into Employee (EmployeeID, FirstName, LastName, SSN, Salary, PayType, JobType) values (?,?,?,?,?,?,?)"
@@ -204,7 +204,7 @@ public class Application {
                         System.out.println("(4) HR");
                         String employeeType = scan.nextLine();
                         
-                        String firstName, lastName, payType, jobType, newUser, newPass;
+                        String firstName, lastName, payType, jobType, newPass;
                         BigDecimal salary = null;
                         int employeeID, SSN;
                     	System.out.print("Employee ID: ");
@@ -230,6 +230,16 @@ public class Application {
                         insertIntoEmployee.setString(6, payType);
                         insertIntoEmployee.setString(7, jobType);
                         insertIntoEmployee.executeUpdate();
+                        
+                        
+                        System.out.println("Username: " + employeeID);
+                        System.out.println("Password: ");
+                        newPass = scan.nextLine();
+                        System.out.println("Privilege: " + jobType);
+                        
+                        createNewEmployee.setInt(1, employeeID);
+                        createNewEmployee.setString(2, newPass);
+                        createNewEmployee.setString(3, jobType);
                     }
                     
                     
