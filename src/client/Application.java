@@ -6,6 +6,7 @@
  *  - Customer model bought and quantity to make prediction and understand trending
  *  - For each order, the associated parts and available inventory
  *  - Expense report, employee showing salary, bonus expense and part cost
+ *  - New message.
  */
 
 package client;
