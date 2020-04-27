@@ -37,14 +37,14 @@ public class Application {
             // LOGIN PART
             // Stay in loop while there are no matches for username and password
             String privilege = null;
-            while(true){
+            while (true) {
                 /* Login Prompt */
                 System.out.println("Username: ");
                 username = scan.nextLine();
                 System.out.println("Password: ");
                 password = scan.nextLine();
                 
-                // Find out the priviledge of the person who logged in.
+                // Find out the privilege of the person who logged in.
                 // Select privilege... where the username and password matches.
                 /*
                 String getPrivilege = "SELECT Privilege FROM Login JOIN Employee_Login"
@@ -57,13 +57,13 @@ public class Application {
                 String getPrivilege = "SELECT Privilege FROM Login WHERE Username ="
                                         + username + "AND Password = " + password;
                 
-                ResultSet rset = stmt.executeQuery(getPriviledge);                
-                while (rset.next()){
+                ResultSet rset = stmt.executeQuery(getPrivilege);                
+                while (rset.next()) {
                     privilege = rset.getString(1);
                 }
                 
                 // If there is no match, keep going in the loop, else break.
-                if (privilege == null){
+                if (privilege == null) {
                     System.out.println("Username and/or password incorrect");
                 } else {
                     break;
@@ -108,7 +108,7 @@ public class Application {
             
             
             // Create while loops for each privilege (type of user):
-            if (privilege == "admin"){
+            if (privilege.equals("admin")) {
                 while (true) {
                     System.out.println("What would you like to do? (Type number) Options:");
                     System.out.println("(1) Create a new Employee");
@@ -119,11 +119,11 @@ public class Application {
                     String userInput = scan.nextLine();
                     
                     // For each option, write the code to satisfy it.
-                    if (userInput == "5"){
+                    if (userInput.equals("5")) {
                         break;
-                    } else if (userInput == "4"){
+                    } else if (userInput.equals("4")) {
                         // FIXME: analytics
-                    } else if (userInput == "3"){
+                    } else if (userInput.equals("3")) {
                         // Ask for EmployeeID, and the permission, plug those values into the grantRole prepared statement, then exectue.
                         System.out.println("Enter EmployeeID of person to grant:");
                         String employeeGrant = scan.nextLine();
@@ -134,7 +134,7 @@ public class Application {
                         grantRoleToEmployee.setString(2, employeeGrant);
                         grantRoleToEmployee.executeUpdate();
                         
-                    } else if (userInput == "2"){
+                    } else if (userInput.equals("2")) {
                         // User names a table, and it is printed.
                         // Then, the user may enter some SQL to update any table.
                         
@@ -142,40 +142,40 @@ public class Application {
                         String tname = scan.nextLine();
                         
                         ResultSet rset = null;
-                        switch(tname){
+                        switch(tname) {
                             case "Login":
                                 rset = stmt.executeQuery(selectLogin);
-                                while (rset.next()){
+                                while (rset.next()) {
                                     System.out.println(rset.getString(1)+" "+rset.getString(2)+" "+rset.getString(3)+" "+rset.getString(4));
                                 }
                                 break;
                             case "Employee":
                                 rset = stmt.executeQuery(selectEmployee);
-                                while (rset.next()){
+                                while (rset.next()) {
                                     System.out.println(rset.getString(1)+" "+rset.getString(2)+" "+rset.getString(3)+" "+rset.getString(4)+rset.getString(5)+" "+rset.getString(6)+" "+rset.getString(7));
                                 }
                                 break;
                             case "Inventory":
                                 rset = stmt.executeQuery(selectInventory);
-                                while (rset.next()){
+                                while (rset.next()) {
                                     System.out.println(rset.getString(1)+" "+rset.getString(2)+" "+rset.getString(3)+" "+rset.getString(4)+rset.getString(5));
                                 }
                                 break;
                             case "Customer":
                                 rset = stmt.executeQuery(selectCustomer);
-                                while (rset.next()){
+                                while (rset.next()) {
                                     System.out.println(rset.getString(1)+" "+rset.getString(2)+" "+rset.getString(3));
                                 }
                                 break;
                             case "Model":
                                 rset = stmt.executeQuery(selectModel);
-                                while (rset.next()){
+                                while (rset.next()) {
                                     System.out.println(rset.getString(1)+" "+rset.getString(2));
                                 }
                                 break;
                             case "Order":
                                 rset = stmt.executeQuery(selectOrder);
-                                while (rset.next()){
+                                while (rset.next()) {
                                     System.out.println(rset.getString(1)+" "+rset.getString(2)+" "+rset.getString(3)+" "+rset.getString(4)+rset.getString(5)+" "+rset.getString(6));
                                 }
                                 break;
@@ -196,7 +196,7 @@ public class Application {
                         
                         
                         
-                    } else if (userInput == "1"){
+                    } else if (userInput.equals("1")) {
                     	System.out.println("User Type: ");
                         System.out.println("(1) Admin");
                         System.out.println("(2) Sales");
@@ -235,7 +235,7 @@ public class Application {
                     
                     
                 }
-            } else if (privilege == "sales"){
+            } else if (privilege.equals("sales")) {
                 while (true) {
                     System.out.println("What would you like to do? (Type number) Options:");
                     System.out.println("(1) View/update a Customer");
@@ -245,46 +245,46 @@ public class Application {
                     String userInput = scan.nextLine();
                     
                     // For each option, write the code to satisfy it.
-                    if (userInput == "4"){
+                    if (userInput.equals("4")) {
                         break;
-                    } else if (userInput == "3"){
+                    } else if (userInput.equals("3")) {
                         // FIXME: Need to write the code for each action
                     }
                     
                     
                     
                 }
-            } else if (privilege == "hr"){
+            } else if (privilege.equals("hr")) {
                 while (true) {
                     System.out.println("What would you like to do? (Type number) Options:");
                     System.out.println("(1) View/update an Employee's information");
                     System.out.println("(2) View sales for an Employee");
-\                   System.out.println("(3) Logout");
+                    System.out.println("(3) Logout");
                     String userInput = scan.nextLine();
                     
                     // For each option, write the code to satisfy it.
-                    if (userInput == "3"){
+                    if (userInput.equals("3")) {
                         break;
-                    } else if (userInput == "2"){
+                    } else if (userInput.equals("2")) {
                         // FIXME: Need to write the code for each action
                     }
                     
                     
                     
                 }
-            } else if (privilege == "engineering"){
+            } else if (privilege.equals("engineering")) {
                 while (true) {
                     System.out.println("What would you like to do? (Type number) Options:");
                     System.out.println("(1) View/update the Inventory");
                     System.out.println("(2) View/update a Model");
-\                   System.out.println("(3) View Employee information");
+                    System.out.println("(3) View Employee information");
                     System.out.println("(4) Logout");
                     String userInput = scan.nextLine();
                     
                     // For each option, write the code to satisfy it.
-                    if (userInput == "4"){
+                    if (userInput.equals("4")) {
                         break;
-                    } else if (userInput == "3"){
+                    } else if (userInput.equals("3")) {
                         // FIXME: Need to write the code for each action
                     }
                     
