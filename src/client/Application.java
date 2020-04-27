@@ -10,6 +10,7 @@
 
 package client;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.Scanner;
 
@@ -196,7 +197,39 @@ public class Application {
                         
                         
                     } else if (userInput == "1"){
+                    	System.out.println("User Type: ");
+                        System.out.println("(1) Admin");
+                        System.out.println("(2) Sales");
+                        System.out.println("(3) Engineer");
+                        System.out.println("(4) HR");
+                        String employeeType = scan.nextLine();
                         
+                        String firstName, lastName, payType, jobType, newUser, newPass;
+                        BigDecimal salary = null;
+                        int employeeID, SSN;
+                    	System.out.print("Employee ID: ");
+                    	employeeID = scan.nextInt();
+                        System.out.print("First Name: ");
+                    	firstName = scan.nextLine();
+                        System.out.print("Last Name: ");
+                        lastName = scan.nextLine();
+                        System.out.print("SSN: ");
+                        SSN = scan.nextInt();
+                        System.out.print("Salary: ");
+                        salary = scan.nextBigDecimal();
+                        System.out.print("Pay Type: ");
+                        payType = scan.nextLine();
+                        System.out.print("Job Type: ");
+                        jobType = scan.nextLine();
+                        
+                        insertIntoEmployee.setInt(1, 2);
+                        insertIntoEmployee.setString(2, firstName);
+                        insertIntoEmployee.setString(3, lastName);
+                        insertIntoEmployee.setInt(4, SSN);
+                        insertIntoEmployee.setBigDecimal(5, salary);
+                        insertIntoEmployee.setString(6, payType);
+                        insertIntoEmployee.setString(7, jobType);
+                        insertIntoEmployee.executeUpdate();
                     }
                     
                     
