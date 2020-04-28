@@ -280,7 +280,27 @@ public class Application {
                         insertIntoOrder.setString(3, emplID);
                         insertIntoOrder.setString(4, saleVal);
                         insertIntoOrder.executeUpdate();
+                    } else if (userInput.equals("1")) {
+                        // Print out all the Customers table
+                        // Let the user run SQL to edit the table
+                        
+                        System.out.println("Here is the Customers table:");
+                        rset = stmt.executeQuery(selectCustomer);
+                        while (rset.next()) {
+                            System.out.println(rset.getString(1)+" "+rset.getString(2)+" "+rset.getString(3));
+                        }
+                        
+                        while (true) {
+                            System.out.println("Input update SQL statement. Press ENTER (empty string) to stop.");
+                            String admin_statement = scan.nextLine();
+                            if (admin_statement.isEmpty()) {
+                                break;
+                            }
+                            stmt.executeUpdate(admin_statement);
+                        }
+                        
                     }
+                    
                 }
                 
                 
