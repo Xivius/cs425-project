@@ -241,6 +241,7 @@ public class Application {
                         createNewEmployee.setInt(1, employeeID);
                         createNewEmployee.setString(2, newPass);
                         createNewEmployee.setString(3, jobType);
+                        createNewEmployee.executeUpdate();
                     }
                     
                     
@@ -260,11 +261,32 @@ public class Application {
                         break;
                     } else if (userInput.equals("3")) {
                         // FIXME: Need to write the code for each action
+                    } else if (userInput.equals("2")) {
+                        //(OrderNumber, CustomerID, EmployeeID, SalesValue)
+                        System.out.println("Enter the order number:");
+                        String orderNumber = scan.nextLine();
+                        
+                        System.out.println("Enter the Customer ID:");
+                        String custID = scan.nextLine();
+                        
+                        System.out.println("Enter the Employee ID:");
+                        String emplID = scan.nextLine();
+                        
+                        System.out.println("Enter the Sales Value:");
+                        String saleVal = scan.nextLine();
+                        
+                        insertIntoOrder.setString(1, orderNumber);
+                        insertIntoOrder.setString(2, custID);
+                        insertIntoOrder.setString(3, emplID);
+                        insertIntoOrder.setString(4, saleVal);
+                        insertIntoOrder.executeUpdate();
                     }
-                    
-                    
-                    
                 }
+                
+                
+                
+                
+                
             } else if (privilege.equals("hr")) {
                 while (true) {
                     System.out.println("What would you like to do? (Type number) Options:");
