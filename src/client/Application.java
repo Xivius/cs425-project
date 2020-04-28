@@ -95,7 +95,7 @@ public class Application {
             String selectCustomer = "SELECT * FROM Customer";
             String selectModel = "SELECT * FROM Model";
             String selectOrder = "SELECT * FROM Order";
-            
+                        
             do {
 	            // LOGIN Prompt
             	String username;
@@ -136,7 +136,7 @@ public class Application {
 	            
 	            // Create while loops for each privilege (type of user):
 	            if (privilege.equals("admin")) {
-	                while (!done) {
+	                while (true) {
 	                    System.out.println("What would you like to do? (Type number) Options:");
 	                    System.out.println("(1) Create a new Employee");
 	                    System.out.println("(2) View/Update a table");
@@ -147,7 +147,7 @@ public class Application {
 	                    
 	                    // For each option, write the code to satisfy it.
 	                    if (userInput.equals("5")) {
-	                    	done = true;
+	                        break;
 	                    } else if (userInput.equals("4")) {
 	                        // FIXME: analytics
 	                    } else if (userInput.equals("3")) {
@@ -220,7 +220,6 @@ public class Application {
 	                            stmt.executeUpdate(admin_statement);
 	                            
 	                        }
-	                        
 	                    } else if (userInput.equals("1")) {
 	                        System.out.println("User Type: ");
 	                        System.out.println("(1) Admin");
@@ -282,9 +281,42 @@ public class Application {
 	                    } else if (userInput.equals("3")) {
 	                        // FIXME: Need to write the code for each action
 	                    } else if (userInput.equals("2")) {
-	                        // FIXME: Need to write the code for each action
+	                        //(OrderNumber, CustomerID, EmployeeID, SalesValue)
+	                        System.out.println("Enter the order number:");
+	                        String orderNumber = scan.nextLine();
+	                        
+	                        System.out.println("Enter the Customer ID:");
+	                        String custID = scan.nextLine();
+	                        
+	                        System.out.println("Enter the Employee ID:");
+	                        String emplID = scan.nextLine();
+	                        
+	                        System.out.println("Enter the Sales Value:");
+	                        String saleVal = scan.nextLine();
+	                        
+	                        insertIntoOrder.setString(1, orderNumber);
+	                        insertIntoOrder.setString(2, custID);
+	                        insertIntoOrder.setString(3, emplID);
+	                        insertIntoOrder.setString(4, saleVal);
+	                        insertIntoOrder.executeUpdate();
 	                    } else if (userInput.equals("1")) {
-	                        // FIXME: Need to write the code for each action
+	                        // Print out all the Customers table
+	                        // Let the user run SQL to edit the table
+	                        
+	                        System.out.println("Here is the Customers table:");
+	                        rs = stmt.executeQuery(selectCustomer);
+	                        while (rs.next()) {
+	                            System.out.println(rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3));
+	                        }
+	                        
+	                        while (true) {
+	                            System.out.println("Input update SQL statement. Press ENTER (empty string) to stop.");
+	                            String admin_statement = scan.nextLine();
+	                            if (admin_statement.isEmpty()) {
+	                                break;
+	                            }
+	                            stmt.executeUpdate(admin_statement);
+	                        }
 	                    }
 	                }
 	            } else if (privilege.equals("hr")) {
