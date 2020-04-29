@@ -11,101 +11,123 @@
 
 package client;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.*;
+import java.util.Properties;
 import java.util.Scanner;
 
 public class Application {
     public static void main(String [] args) {
-    	Connection conn = null;
-    	Connection adminConn = null;
-    	Connection engineerConn = null;
-    	Connection HRConn = null;
-    	Connection salesConn = null;
-    	
-        Statement stmt = null;
-        Statement adminStmt = null;
-        Statement engineerStmt = null;
-        Statement HRStmt = null;
-        Statement salesStmt = null;
-        
-        ResultSet rs = null;
-        
-    	Scanner scan = new Scanner(System.in);
-        
-        boolean authenticated = false;
-        boolean done = false;
-        boolean exitApplication = false;
+        Scanner scan = new Scanner(System.in);
         
         try {
+        	// Access Credentials from *.properties file called DBAccess.properties
+        	// (located outside repository for security reasons)
+        	InputStream input = new FileInputStream("../../../DBAccess.properties");
+        	Properties credentialsFile = new Properties();
+        	credentialsFile.load(input);
+        	
         	// Connection to Database
-            conn = DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5432/postgres", "postgres", "1234"
+            Connection conn = DriverManager.getConnection(
+                "jdbc:postgresql://localhost:5432/" +
+                		credentialsFile.getProperty("database"),
+                credentialsFile.getProperty("username"),
+                credentialsFile.getProperty("password")
             );
-            adminConn = DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5432/postgres", "admin", "1234"
+            Connection adminConn = DriverManager.getConnection(
+        		"jdbc:postgresql://localhost:5432/" +
+                		credentialsFile.getProperty("database"),
+           		credentialsFile.getProperty("admin.username"),
+           		credentialsFile.getProperty("admin.password")
             );
-            engineerConn = DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5432/postgres", "engineer", "1234"
+            Connection engineerConn = DriverManager.getConnection(
+        		"jdbc:postgresql://localhost:5432/" +
+                		credentialsFile.getProperty("database"),
+           		credentialsFile.getProperty("engineer.username"),
+           		credentialsFile.getProperty("engineer.password")
             );
-            HRConn = DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5432/postgres", "hr", "1234"
+            Connection HRConn = DriverManager.getConnection(
+        		"jdbc:postgresql://localhost:5432/" +
+                		credentialsFile.getProperty("database"),
+           		credentialsFile.getProperty("hr.username"),
+           		credentialsFile.getProperty("hr.password")
             );
-            salesConn = DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5432/postgres", "sales", "1234"
+            Connection salesConn = DriverManager.getConnection(
+        		"jdbc:postgresql://localhost:5432/" +
+                		credentialsFile.getProperty("database"),
+           		credentialsFile.getProperty("sales.username"),
+           		credentialsFile.getProperty("sales.password")
             );
             
             // Statements
-            stmt = conn.createStatement();
-            adminStmt = adminConn.createStatement();
-            engineerStmt = engineerConn.createStatement();
-            HRStmt = HRConn.createStatement();
-            salesStmt = salesConn.createStatement();
+            Statement stmt = conn.createStatement();
+            Statement adminStmt = adminConn.createStatement();
+            Statement engineerStmt = engineerConn.createStatement();
+            Statement HRStmt = HRConn.createStatement();
+            Statement salesStmt = salesConn.createStatement();
             
-            // Prepared statements that we might need.
-            PreparedStatement createNewEmployee = conn.prepareStatement(
-                "INSERT INTO Login (UserID, Password, Privilege) values (?,?,?)"
-            );
-            PreparedStatement insertIntoEmployee = conn.prepareStatement(
-                "INSERT INTO Employee (EmployeeID, FirstName, LastName, SSN, Salary, PayType, JobType) values (?,?,?,?,?,?,?)"
-            );
-            PreparedStatement insertIntoInventory = conn.prepareStatement(
-                "INSERT INTO Inventory (ItemID, Cost, LeadTime, CategoryType, CategoryNumber) values (?,?,?,?,?)"
-            );
-            PreparedStatement insertIntoCustomer = conn.prepareStatement(
-                "INSERT INTO Customer (CustomerID, FirstName, LastName) values (?,?,?)"
-            );
-            PreparedStatement insertIntoModel = conn.prepareStatement(
-                "INSERT INTO Model (ModelNumber, SalesPrice) values (?,?)"
-            );
-            PreparedStatement insertIntoOrder = conn.prepareStatement(
-                "INSERT INTO Order (OrderNumber, CustomerID, EmployeeID, SalesValue) values (?,?,?,?)"
-            );
-            PreparedStatement grantRoleToEmployee = conn.prepareStatement(
-                "GRANT ? to ?"
-            );
-            PreparedStatement createOrder = conn.prepareStatement(
-                "INSERT INTO Order (OrderNumber, CustomerID, EmployeeId, SalesValue, ItemID, ModelNumber) values (?,?,?,?,?,?)"
-            );
-            
-            // Other statements
+            // Strings for Simple SQL Queries
             String selectLogin = "SELECT * FROM Login";
             String selectEmployee = "SELECT * FROM Employee";
             String selectInventory = "SELECT * FROM Inventory";
             String selectCustomer = "SELECT * FROM Customer";
             String selectModel = "SELECT * FROM Model";
-            String selectOrder = "SELECT * FROM Order";
-                        
+            String selectOrder = "SELECT * FROM SalesOrder";
+            
+            // Prepared statements that we might need.
+            PreparedStatement selectEmployeeWhere = conn.prepareStatement(
+            	"SELECT * FROM Employee WHERE EmployeeID = ?"
+            );
+            PreparedStatement createNewEmployee = conn.prepareStatement(
+                "INSERT INTO Login (UserID, Password, Privilege) VALUES (?,?,?)"
+            );
+            PreparedStatement createOrder = conn.prepareStatement(
+            	"INSERT INTO SalesOrder (OrderNumber, CustomerID, EmployeeId, SalesValue, ItemID, ModelNumber) VALUES (?,?,?,?,?,?)"
+            );
+            PreparedStatement insertIntoEmployee = conn.prepareStatement(
+                "INSERT INTO Employee (EmployeeID, FirstName, LastName, SSN, Salary, PayType, JobType) VALUES (?,?,?,?,?,?,?)"
+            );
+            PreparedStatement insertIntoInventory = conn.prepareStatement(
+                "INSERT INTO Inventory (ItemID, Cost, LeadTime, CategoryType, CategoryNumber) VALUES (?,?,?,?,?)"
+            );
+            PreparedStatement insertIntoCustomer = conn.prepareStatement(
+                "INSERT INTO Customer (CustomerID, FirstName, LastName) VALUES (?,?,?)"
+            );
+            PreparedStatement insertIntoModel = conn.prepareStatement(
+                "INSERT INTO Model (ModelNumber, SalesPrice) VALUES (?,?)"
+            );
+            PreparedStatement insertIntoOrder = conn.prepareStatement(
+                "INSERT INTO SalesOrder (OrderNumber, CustomerID, EmployeeID, SalesValue) VALUES (?,?,?,?)"
+            );
+            PreparedStatement grantRoleToEmployee = conn.prepareStatement(
+                "GRANT ? TO ?"
+            );
+            
+            // ResultSets
+            ResultSet rs = null;
+            
+            // Booleans for while loops
+            boolean authenticated, done, exitApplication;
+            
             do {
+            	// Reset looping conditions
+            	authenticated = false;
+	            done = false;
+	            exitApplication = false;
+            	
 	            // LOGIN Prompt
-            	String username;
-                String password;
+            	String username, password;
 	            String privilege = null;
+	            
 	            do {
 	            	// Stay in loop while there are no matches for username and password
-	                System.out.println("Username: ");
+	                System.out.print("Username: ");
 	                username = scan.nextLine();
-	                System.out.println("Password: ");
+	                System.out.print("Password: ");
 	                password = scan.nextLine();
 	                
 	                // Find out the privilege of the person who logged in.
@@ -134,27 +156,29 @@ public class Application {
 	                }
 	            } while (!authenticated);
 	            
+	            done = false; // reset done variable (used to break out of while loops)
 	            // Create while loops for each privilege (type of user):
-	            if (privilege.equals("admin")) {
-	                while (true) {
-	                    System.out.println("What would you like to do? (Type number) Options:");
+	            if (privilege.equalsIgnoreCase("admin")) {
+	                while (!done) {
+                        System.out.println("Options:");
 	                    System.out.println("(1) Create a new Employee");
 	                    System.out.println("(2) View/Update a table");
 	                    System.out.println("(3) Grant access to an Employee");
 	                    System.out.println("(4) Business analytics");
 	                    System.out.println("(5) Logout");
+	                    System.out.print("What would you like to do? (Type number): ");
 	                    String userInput = scan.nextLine();
 	                    
 	                    // For each option, write the code to satisfy it.
 	                    if (userInput.equals("5")) {
-	                        break;
+	                        done = true;
 	                    } else if (userInput.equals("4")) {
 	                        // FIXME: analytics
 	                    } else if (userInput.equals("3")) {
 	                        // Ask for EmployeeID, and the permission, plug those values into the grantRole prepared statement, then exectue.
-	                        System.out.println("Enter EmployeeID of person to grant:");
+	                        System.out.print("Enter EmployeeID of person to grant: ");
 	                        String employeeGrant = scan.nextLine();
-	                        System.out.println("Enter privilege to grant to the EmployeeID (Admin, HR, Sales, Engineering):");
+	                        System.out.print("Enter privilege to be granted (Admin, HR, Sales, Engineering): ");
 	                        String employeePrivilege = scan.nextLine();
 	                        
 	                        grantRoleToEmployee.setString(1, employeePrivilege);
@@ -200,7 +224,7 @@ public class Application {
 	                                    System.out.println(rset.getString(1)+" "+rset.getString(2));
 	                                }
 	                                break;
-	                            case "Order":
+	                            case "SalesOrder":
 	                                rset = stmt.executeQuery(selectOrder);
 	                                while (rset.next()) {
 	                                    System.out.println(rset.getString(1)+" "+rset.getString(2)+" "+rset.getString(3)+" "+rset.getString(4)+rset.getString(5)+" "+rset.getString(6));
@@ -211,21 +235,21 @@ public class Application {
 	                        }
 	                        
 	                        // Keep asking for update statements until user enters "".
-	                        while (true) {
+	                        String admin_statement = "";
+	                        while (!admin_statement.isEmpty()) {
 	                            System.out.println("Input update SQL statement. Press ENTER (empty string) to stop.");
-	                            String admin_statement = scan.nextLine();
-	                            if (admin_statement.isEmpty()) {
-	                                break;
+	                            admin_statement = scan.nextLine();
+	                            if (!admin_statement.isEmpty()) {
+	                            	stmt.executeUpdate(admin_statement);
 	                            }
-	                            stmt.executeUpdate(admin_statement);
-	                            
 	                        }
 	                    } else if (userInput.equals("1")) {
-	                        System.out.println("User Type: ");
+                            System.out.println("Options:");
 	                        System.out.println("(1) Admin");
 	                        System.out.println("(2) Sales");
 	                        System.out.println("(3) Engineer");
 	                        System.out.println("(4) HR");
+	                    	System.out.print("User Type (Type the number): ");
 	                        String employeeType = scan.nextLine();
 	                        
 	                        String firstName, lastName, payType, jobType, newPass;
@@ -241,9 +265,9 @@ public class Application {
 	                        SSN = scan.nextInt();
 	                        System.out.print("Salary: ");
 	                        salary = scan.nextBigDecimal();
-	                        System.out.print("Pay Type: ");
+	                        System.out.print("Pay Type (Hourly/Yearly): ");
 	                        payType = scan.nextLine();
-	                        System.out.print("Job Type: ");
+	                        System.out.print("Job Type (Admin, Sales, HR, or Engineer): ");
 	                        jobType = scan.nextLine();
 	                        
 	                        insertIntoEmployee.setInt(1, 2);
@@ -264,34 +288,37 @@ public class Application {
 	                        createNewEmployee.setString(2, newPass);
 	                        createNewEmployee.setString(3, jobType);
 	                        createNewEmployee.executeUpdate();
+	                    } else {
+	                    	System.out.println("Invalid Option.");
 	                    }
 	                }
-	            } else if (privilege.equals("sales")) {
-	                while (true) {
-	                    System.out.println("What would you like to do? (Type number) Options:");
+	            } else if (privilege.equalsIgnoreCase("sales")) {
+	                while (!done) {
+                        System.out.println("Options:");
 	                    System.out.println("(1) View/update a Customer");
 	                    System.out.println("(2) Create an Order");
 	                    System.out.println("(3) Access sales reports");
 	                    System.out.println("(4) Logout");
+	                    System.out.print("What would you like to do? (Type number): ");
 	                    String userInput = scan.nextLine();
 	                    
 	                    // For each option, write the code to satisfy it.
 	                    if (userInput.equals("4")) {
-	                        break;
+	                        done = true;
 	                    } else if (userInput.equals("3")) {
 	                        // FIXME: Need to write the code for each action
 	                    } else if (userInput.equals("2")) {
 	                        //(OrderNumber, CustomerID, EmployeeID, SalesValue)
-	                        System.out.println("Enter the order number:");
+	                        System.out.print("Enter the order number: ");
 	                        String orderNumber = scan.nextLine();
 	                        
-	                        System.out.println("Enter the Customer ID:");
+	                        System.out.print("Enter the Customer ID: ");
 	                        String custID = scan.nextLine();
 	                        
-	                        System.out.println("Enter the Employee ID:");
+	                        System.out.print("Enter the Employee ID: ");
 	                        String emplID = scan.nextLine();
 	                        
-	                        System.out.println("Enter the Sales Value:");
+	                        System.out.print("Enter the Sales Value: ");
 	                        String saleVal = scan.nextLine();
 	                        
 	                        insertIntoOrder.setString(1, orderNumber);
@@ -317,76 +344,216 @@ public class Application {
 	                            }
 	                            stmt.executeUpdate(admin_statement);
 	                        }
+	                    } else {
+	                    	System.out.println("Invalid Option.");
 	                    }
 	                }
-	            } else if (privilege.equals("hr")) {
-	                while (true) {
-	                    System.out.println("What would you like to do? (Type number) Options:");
+	            } else if (privilege.equalsIgnoreCase("hr")) {
+	                while (!done) {
+                        System.out.println("Options:");
 	                    System.out.println("(1) View/update an Employee's information");
 	                    System.out.println("(2) View sales for an Employee");
 	                    System.out.println("(3) Logout");
+	                    System.out.print("What would you like to do? (Type number): ");
 	                    String userInput = scan.nextLine();
 	                    
 	                    // For each option, write the code to satisfy it.
 	                    if (userInput.equals("3")) {
-	                        break;
+	                        done = true;
 	                    } else if (userInput.equals("2")) {
-	                    	String sql = "SELECT EmployeeID, FirstName, LastName FROM Employee";
-	                    	rs = HRStmt.executeQuery(sql);
-	                        
-	                    	System.out.println("List of Employees");
-	                    	while (rs.next()) {
-	                    		System.out.println(rs.getInt("EmployeeID") + ": " 
-                    				+ rs.getString("LastName") + ", " + rs.getString("FirstName"));
-	                    	}
-	                    	
-	                    	do {
-	                    		System.out.println("Type q or quit to quit.");
-	                    		System.out.print("Enter Employee Name (Last, First): ");
-	                    		userInput = scan.nextLine();
-	                    		String [] name = userInput.split(", ");
-	                    		sql = "SELECT EmployeeID, FirstName, LastName, Salary " 
+	                    	PreparedStatement ps = HRConn.prepareStatement(
+                                "SELECT * FROM SalesOrder"
+                            );
+                            
+                            String sql = "SELECT EmployeeID, FirstName, LastName, Salary "
                     				+ "FROM Employee "
-                    				+ "WHERE FirstName = " + name[1] + " AND "
-                    				+ "LastName = " + name[0];
-	                    		rs = HRStmt.executeQuery(sql);
-	                    		
-	                    		while (rs.next()) {
-	                    			System.out.println(rs.getInt("EmployeeID") + ": $" 
-                        				+ rs.getBigDecimal("Salary"));
-	                    		}
-	                    	} while (!userInput.toLowerCase().equals("q") ||
-	                    			 !userInput.toLowerCase().equals("quit"));
+                    				+ "WHERE EmployeeID = " + userInput;
+                            rs = HRStmt.executeQuery(sql);
+                            
+                            while (rs.next()) {
+                                System.out.println(rs.getInt("EmployeeID") + ": $"
+                                    + rs.getBigDecimal("Salary"));
+                            }
 	                    } else if (userInput.equals("1")) {
-	                        // FIXME: Need to write the code for each action
+	                    	String userQueryID = "";
+	                        
+	                    	do {
+	                    		System.out.println("Type a or all to see all employees.");
+		                    	System.out.println("Type q or quit to quit.");
+	                    		System.out.print("Enter Employee ID Number: ");
+	                    		userQueryID = scan.nextLine(); // prompt user for ID
+	                    		
+	                    		if (userInput.equalsIgnoreCase("a") ||
+	                    				userInput.equalsIgnoreCase("all")) { // see all option
+	                    			selectEmployeeWhere.setInt(1, Integer.parseInt(userQueryID));
+	                    			rs = selectEmployeeWhere.executeQuery();
+	                    			System.out.println("List of Employees: ");
+	    	                    	while (rs.next()) { // print out all employees
+	    	                    		System.out.println(rs.getInt("EmployeeID") + ": " 
+	                        				+ rs.getString("LastName") + ", " + rs.getString("FirstName"));
+	    	                    	}
+	    	                    	System.out.println("");
+	                    		} else if (userInput.matches("\\d+")) { // valid ID format
+	                    			selectEmployeeWhere.setInt(1, Integer.parseInt(userQueryID));
+	                    			rs = selectEmployeeWhere.executeQuery();
+	                    			
+	                    			if (!rs.next()) { // ID not found
+                    					System.out.println("Sorry; there is no employee with ID " + userQueryID + ".");
+	                    			} else { // found an employee with matching ID
+	                    				System.out.println(rs.toString()); // TODO: print all employee information
+	                    				System.out.print("Modify this information (y/n)? ");
+	                    				userInput = scan.nextLine();
+	                    				if (userInput.equalsIgnoreCase("y") || userInput.equalsIgnoreCase("yes")) {
+	                    					// modify user info:
+	                    					String firstName, lastName, payType, jobType, newPass;
+	            	                        BigDecimal salary = null;
+	            	                        int employeeID, SSN;
+	            	                        
+                                            // used to modify employee info
+                                            PreparedStatement updateEmployee = null;
+                                            
+                                            do {
+                                                System.out.println("Options: ");
+                                                System.out.println("(1) Employee ID");
+                                                System.out.println("(2) First Name");
+                                                System.out.println("(3) Last Name");
+                                                System.out.println("(4) SSN");
+                                                System.out.println("(5) Salary");
+                                                System.out.println("(6) Pay Type");
+                                                System.out.println("(7) Job Type");
+                                                System.out.println("(8) Quit");
+                                                System.out.print("Choose a field to modify (Type number): ");
+                                                userInput = scan.nextLine();
+                                                
+                                                switch (userInput) {
+                                                    case "1":
+                                                        System.out.print("Employee ID: ");
+                                                        employeeID = scan.nextInt();
+                                                        updateEmployee = HRConn.prepareStatement(
+                                                            "UPDATE Employee SET EmployeeID = ? " +
+                                                            "WHERE EmployeeID = ?"
+                                                        );
+                                                        updateEmployee.setInt(1, employeeID);
+                                                        updateEmployee.setInt(2, Integer.parseInt(userQueryID));
+                                                        updateEmployee.executeUpdate();
+                                                        userQueryID = Integer.toString(employeeID); // keep user on this employee
+                                                        break;
+                                                    case "2":
+                                                        System.out.print("First Name: ");
+                                                        firstName = scan.nextLine();
+                                                        updateEmployee = HRConn.prepareStatement(
+                                                            "UPDATE Employee SET FirstName = ? " +
+                                                            "WHERE EmployeeID = ?"
+                                                        );
+                                                        updateEmployee.setString(1, firstName);
+                                                        updateEmployee.setInt(2, Integer.parseInt(userQueryID));
+                                                        updateEmployee.executeUpdate();
+                                                        break;
+                                                    case "3":
+                                                        System.out.print("Last Name: ");
+                                                        lastName = scan.nextLine();
+                                                        updateEmployee = HRConn.prepareStatement(
+                                                            "UPDATE Employee SET LastName = ? " +
+                                                            "WHERE EmployeeID = ?"
+                                                        );
+                                                        updateEmployee.setString(1, lastName);
+                                                        updateEmployee.setInt(2, Integer.parseInt(userQueryID));
+                                                        updateEmployee.executeUpdate();
+                                                        break;
+                                                    case "4":
+                                                        System.out.print("SSN: ");
+                                                        SSN = scan.nextInt();
+                                                        updateEmployee = HRConn.prepareStatement(
+                                                            "UPDATE Employee SET SSN = ? " +
+                                                            "WHERE EmployeeID = ?"
+                                                        );
+                                                        updateEmployee.setInt(1, SSN);
+                                                        updateEmployee.setInt(2, Integer.parseInt(userQueryID));
+                                                        updateEmployee.executeUpdate();
+                                                        break;
+                                                    case "5":
+                                                        System.out.print("Salary: ");
+                                                        salary = scan.nextBigDecimal();
+                                                        updateEmployee = HRConn.prepareStatement(
+                                                            "UPDATE Employee SET Salary = ? " +
+                                                            "WHERE EmployeeID = ?"
+                                                        );
+                                                        updateEmployee.setBigDecimal(1, salary);
+                                                        updateEmployee.setInt(2, Integer.parseInt(userQueryID));
+                                                        updateEmployee.executeUpdate();
+                                                        break;
+                                                    case "6":
+                                                        System.out.print("Pay Type (Hourly/Yearly): ");
+                                                        payType = scan.nextLine();
+                                                        updateEmployee = HRConn.prepareStatement(
+                                                            "UPDATE Employee SET PayType = ? " +
+                                                            "WHERE EmployeeID = ?"
+                                                        );
+                                                        updateEmployee.setString(1, payType);
+                                                        updateEmployee.setInt(2, Integer.parseInt(userQueryID));
+                                                        updateEmployee.executeUpdate();
+                                                        break;
+                                                    case "7":
+                                                        System.out.print("Job Type (Admin, Sales, HR, or Engineer): ");
+                                                        jobType = scan.nextLine();
+                                                        updateEmployee = HRConn.prepareStatement(
+                                                            "UPDATE Employee SET JobType = ? " +
+                                                            "WHERE EmployeeID = ?"
+                                                        );
+                                                        updateEmployee.setString(1, jobType);
+                                                        updateEmployee.setInt(2, Integer.parseInt(userQueryID));
+                                                        updateEmployee.executeUpdate();
+                                                        break;
+                                                    case "8":
+                                                        break;
+                                                    default:
+                                                        System.out.println("Invalid option.");
+                                                }
+                                            } while (!userInput.equals("8"));
+	                    				}
+	                    			}
+	                    			System.out.println("");
+	                    		} else if (!userInput.equalsIgnoreCase("q") &&
+	                    				   !userInput.equalsIgnoreCase("quit")) { // invalid ID format
+	                    			System.out.println("Invalid Employee ID. Please enter a positive integer value.\n");
+	                    		}
+	                    	} while (!userInput.equalsIgnoreCase("q") &&
+	                    			 !userInput.equalsIgnoreCase("quit"));
+	                    } else {
+	                    	System.out.println("Invalid Option.");
 	                    }
 	                }
-	            } else if (privilege.equals("engineering")) {
-	                while (true) {
-	                    System.out.println("What would you like to do? (Type number) Options:");
+	            } else if (privilege.equalsIgnoreCase("engineering")) {
+	                while (!done) {
+                        System.out.println("Options:");
 	                    System.out.println("(1) View/update the Inventory");
 	                    System.out.println("(2) View/update a Model");
 	                    System.out.println("(3) View Employee information");
 	                    System.out.println("(4) Logout");
+	                    System.out.print("What would you like to do? (Type number): ");
 	                    String userInput = scan.nextLine();
 	                    
 	                    // For each option, write the code to satisfy it.
 	                    if (userInput.equals("4")) {
-	                        break;
+	                        done = true;
 	                    } else if (userInput.equals("3")) {
 	                        // FIXME: Need to write the code for each action
 	                    } else if (userInput.equals("2")) {
 	                        // FIXME: Need to write the code for each action
 	                    } else if (userInput.equals("1")) {
 	                        // FIXME: Need to write the code for each action
+	                    } else {
+	                    	System.out.println("Invalid Option.");
 	                    }
 	                }
 	            } else {
 	                System.out.println("Something went wrong, no department matched...");
 	            }
-	            
-	            done = false;
         	} while (!exitApplication);
+        } catch (FileNotFoundException fnfe) {
+        	System.out.println(fnfe.getMessage());
+        } catch (IOException ioe) {
+        	System.out.println(ioe.getMessage());
         } catch (SQLException sqle) {
             System.out.println(sqle.getMessage());
         }
