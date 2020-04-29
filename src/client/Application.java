@@ -137,8 +137,8 @@ public class Application {
                     // Stay in loop while there are no matches for username and password
                     System.out.print("Username: ");
                     while (!scan.hasNextInt()) {
-                    	System.out.print("Please enter a positive integer: ");
-                    	scan.nextLine();
+                        System.out.print("Please enter a positive integer: ");
+                        scan.nextLine();
                     }
                     userID = scan.nextInt();
                     scan.nextLine(); // consume rest of line
@@ -147,9 +147,9 @@ public class Application {
                     
                     // Find out the privilege of the person who logged in.
                     String getPrivilege = "SELECT Privilege FROM Login " +
-                    		"WHERE UserID = ? AND Password = ?";
+                            "WHERE UserID = ? AND Password = ?";
                     PreparedStatement selectLoginPrivilege =
-                    		conn.prepareStatement(getPrivilege);
+                            conn.prepareStatement(getPrivilege);
                     selectLoginPrivilege.setInt(1, userID);
                     selectLoginPrivilege.setString(2, password);
                     rs = selectLoginPrivilege.executeQuery();
@@ -186,11 +186,10 @@ public class Application {
                             // Ask for EmployeeID, and the permission, plug those values into the grantRole prepared statement, then exectue.
                             System.out.print("Enter EmployeeID of person to grant: ");
                             String employeeGrant = scan.nextLine();
-                            int empID = Integer.parseInt(employeeGrant)
+                            int empID = Integer.parseInt(employeeGrant);
                             System.out.print("Enter privilege to be granted (Admin, HR, Sales, Engineering): ");
                             String employeePrivilege = scan.nextLine();
                             
-                            grantRoleToEmployee.setString(1, employeePrivilege);
                             grantRoleToEmployee.setInt(2, empID);
                             grantRoleToEmployee.executeUpdate();
                             
