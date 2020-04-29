@@ -71,7 +71,7 @@ public class Application {
             Statement salesStmt = salesConn.createStatement();
             
             // Report queries
-            String totalRevenueReport = "SELECT sum(SalesValue), EmployeeID FROM Order GROUP BY EmployeeID";
+            String totalRevenueReport = "SELECT EmployeeID, sum(SalesValue) FROM Order GROUP BY EmployeeID";
             String modelNumbersBoughtReport = "SELECT ModelNumber, count(ModelNumber) FROM Order_Details GROUP BY ModelNumber";
             String partsInInventoryReport = "SELECT ItemID, count(ItemID) FROM Inventory GROUP BY ItemID";
             
@@ -186,7 +186,29 @@ public class Application {
                         if (userInput.equals("5")) {
                             done = true;
                         } else if (userInput.equals("4")) {
-                            // FIXME: analytics
+                            // Analytics options shown. After selection, they query is executed and results printed.
+                            System.out.println("Available report options:");
+                            System.out.println("(1) Total revenue");
+                            System.out.println("(2) Model numbers bought");
+                            System.out.println("(3) Total parts in inventory");
+                            System.out.print("What would you like to do? (Type number): ");
+                            String userRNum = scan.nextLine();
+                            if (userInput.equals("1")) {
+                                rset = stmt.executeQuery(totalRevenueReport);
+                                while (rset.next()) {
+                                    System.out.println(rset.getString(1)+" "+rset.getString(2));
+                                }
+                            } else if (userInput.equals("2")) {
+                                rset = stmt.executeQuery(modelNumbersBoughtReport);
+                                while (rset.next()) {
+                                    System.out.println(rset.getString(1)+" "+rset.getString(2));
+                                }
+                            } else if (userInput.equals("3")) {
+                                rset = stmt.executeQuery(partsInInventoryReport);
+                                while (rset.next()) {
+                                    System.out.println(rset.getString(1)+" "+rset.getString(2));
+                                }
+                            }
                         } else if (userInput.equals("3")) {
                             // Ask for EmployeeID, and the permission, plug those values into the grantRole prepared statement, then exectue.
                             System.out.print("Enter EmployeeID of person to grant: ");
