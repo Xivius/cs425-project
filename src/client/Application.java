@@ -186,11 +186,12 @@ public class Application {
                             // Ask for EmployeeID, and the permission, plug those values into the grantRole prepared statement, then exectue.
                             System.out.print("Enter EmployeeID of person to grant: ");
                             String employeeGrant = scan.nextLine();
+                            int empID = Integer.parseInt(employeeGrant)
                             System.out.print("Enter privilege to be granted (Admin, HR, Sales, Engineering): ");
                             String employeePrivilege = scan.nextLine();
                             
                             grantRoleToEmployee.setString(1, employeePrivilege);
-                            grantRoleToEmployee.setString(2, employeeGrant);
+                            grantRoleToEmployee.setInt(2, empID);
                             grantRoleToEmployee.executeUpdate();
                             
                         } else if (userInput.equals("2")) {
