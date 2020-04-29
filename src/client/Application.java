@@ -114,6 +114,7 @@ public class Application {
             
             // ResultSet to hold data for Queries
             ResultSet rs = null;
+            ResultSet rset = null; // I used a different name for my code
             
             // Initialize search_path to point to BusinessSchema
             // as defined in SQL DDL (deliverable 2)
@@ -177,7 +178,7 @@ public class Application {
                         System.out.println("(1) Create a new Employee");
                         System.out.println("(2) View/Update a table");
                         System.out.println("(3) Grant access to an Employee");
-                        System.out.println("(4) Business analytics");
+                        System.out.println("(4) Business analytics and reports");
                         System.out.println("(5) Logout");
                         System.out.print("What would you like to do? (Type number): ");
                         String userInput = scan.nextLine();
@@ -375,7 +376,7 @@ public class Application {
                         System.out.println("Options:");
                         System.out.println("(1) View/update a Customer");
                         System.out.println("(2) Create an Order");
-                        System.out.println("(3) Access sales reports");
+                        System.out.println("(3) Access sales, and other reports");
                         System.out.println("(4) Logout");
                         System.out.print("What would you like to do? (Type number): ");
                         String userInput = scan.nextLine();
@@ -384,7 +385,29 @@ public class Application {
                         if (userInput.equals("4")) {
                             done = true;
                         } else if (userInput.equals("3")) {
-                            // FIXME: Need to write the code for each action
+                            // Analytics options shown. After selection, they query is executed and results printed.
+                            System.out.println("Available report options:");
+                            System.out.println("(1) Total revenue");
+                            System.out.println("(2) Model numbers bought");
+                            System.out.println("(3) Total parts in inventory");
+                            System.out.print("What would you like to do? (Type number): ");
+                            String userRNum = scan.nextLine();
+                            if (userInput.equals("1")) {
+                                rset = stmt.executeQuery(totalRevenueReport);
+                                while (rset.next()) {
+                                    System.out.println(rset.getString(1)+" "+rset.getString(2));
+                                }
+                            } else if (userInput.equals("2")) {
+                                rset = stmt.executeQuery(modelNumbersBoughtReport);
+                                while (rset.next()) {
+                                    System.out.println(rset.getString(1)+" "+rset.getString(2));
+                                }
+                            } else if (userInput.equals("3")) {
+                                rset = stmt.executeQuery(partsInInventoryReport);
+                                while (rset.next()) {
+                                    System.out.println(rset.getString(1)+" "+rset.getString(2));
+                                }
+                            }
                         } else if (userInput.equals("2")) {
                             //(OrderNumber, CustomerID, EmployeeID, SalesValue)
                             System.out.print("Enter the order number: ");
