@@ -71,7 +71,7 @@ public class Application {
             Statement salesStmt = salesConn.createStatement();
             
             // Report queries
-            String totalRevenueReport = "SELECT EmployeeID, sum(SalesValue) FROM Order GROUP BY EmployeeID";
+            String totalRevenueReport = "SELECT EmployeeID, sum(SalesValue) FROM SalesOrder GROUP BY EmployeeID";
             String modelNumbersBoughtReport = "SELECT ModelNumber, count(ModelNumber) FROM Order_Details GROUP BY ModelNumber";
             String partsInInventoryReport = "SELECT ItemID, count(ItemID) FROM Inventory GROUP BY ItemID";
             
@@ -188,8 +188,6 @@ public class Application {
                             done = true;
                         } else if (userInput.equals("4")) {
                             // Analytics options shown. After selection, they query is executed and results printed.
-                            ResultSet rset = null;
-                            
                             System.out.println("Available report options:");
                             System.out.println("(1) Total revenue");
                             System.out.println("(2) Model numbers bought");
