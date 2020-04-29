@@ -141,7 +141,7 @@ public class Application {
                 do {
                     // Stay in loop while there are no matches for username and password
                     System.out.print("Username: ");
-                    while (!scan.hasNextInt()) {
+                    while (!scan.hasNextInt()) { // validate input value
                         System.out.print("Please enter a positive integer: ");
                         scan.nextLine();
                     }
@@ -187,6 +187,8 @@ public class Application {
                             done = true;
                         } else if (userInput.equals("4")) {
                             // Analytics options shown. After selection, they query is executed and results printed.
+                            ResultSet rset = null;
+                            
                             System.out.println("Available report options:");
                             System.out.println("(1) Total revenue");
                             System.out.println("(2) Model numbers bought");
@@ -291,19 +293,60 @@ public class Application {
                             BigDecimal salary = null;
                             int employeeID, SSN;
                             System.out.print("Employee ID: ");
+                            while (!scan.hasNextInt()) { // validate input value
+                                System.out.print("Please enter a positive integer: ");
+                                scan.nextLine();
+                            }
                             employeeID = scan.nextInt();
+                            scan.nextLine(); // consume rest of line
                             System.out.print("First Name: ");
                             firstName = scan.nextLine();
                             System.out.print("Last Name: ");
                             lastName = scan.nextLine();
                             System.out.print("SSN: ");
+                            while (!scan.hasNextInt()) { // validate input value
+                                System.out.print("Please enter a valid SSN (without dashes): ");
+                                scan.nextLine();
+                            }
                             SSN = scan.nextInt();
+                            scan.nextLine(); // consume rest of line
                             System.out.print("Salary: ");
+                            while (!scan.hasNextBigDecimal()) { // validate input value
+                                System.out.print("Please enter a valid salary: ");
+                                scan.nextLine();
+                            }
                             salary = scan.nextBigDecimal();
+                            scan.nextLine(); // consume rest of line
                             System.out.print("Pay Type (Hourly/Yearly): ");
                             payType = scan.nextLine();
+                            while (!payType.equals("Hourly") && !payType.equals("Yearly")) { // validate input value
+                                if (payType.equalsIgnoreCase("Hourly")) { // Fix value (CaseSensitive)
+                                    payType = "Hourly";
+                                } else if (payType.equalsIgnoreCase("Yearly")) {
+                                	payType = "Yearly";
+                                } else { // invalid entry
+                                	System.out.print("Please enter a valid Pay Type (Hourly or Yearly): ");
+                                	payType = scan.nextLine();
+                                }
+                            }
                             System.out.print("Job Type (Admin, Sales, HR, or Engineer): ");
                             jobType = scan.nextLine();
+                            while (!jobType.equals("Admin") && !jobType.equals("Engineer")
+                            		&& !jobType.equals("HR") && !jobType.equals("Sales")) { // validate input value
+                                if (jobType.equalsIgnoreCase("Admin")) { // Fix value (CaseSensitive)
+                                	jobType = "Admin";
+                                } else if (jobType.equalsIgnoreCase("Engineer")) {
+                                	jobType = "Engineer";
+                                } else if (jobType.equalsIgnoreCase("HR")) {
+                                	jobType = "HR";
+                                } else if (jobType.equalsIgnoreCase("Sales")) {
+                                	jobType = "Sales";
+                                } else {
+                                	System.out.print("Please enter a valid Job Type " 
+                                			+ "(Admin, Engineer, HR, Sales): ");
+                                	jobType = scan.nextLine();
+                                }
+                            }
                             
                             insertIntoEmployee.setInt(1, 2);
                             insertIntoEmployee.setString(2, firstName);
@@ -348,18 +391,33 @@ public class Application {
                             String orderNumber = scan.nextLine();
                             
                             System.out.print("Enter the Customer ID: ");
-                            String custID = scan.nextLine();
+                            while (!scan.hasNextInt()) { // validate input value
+                                System.out.print("Please enter a positive integer: ");
+                                scan.nextLine();
+                            }
+                            int custID = scan.nextInt();
+                            scan.nextLine(); // consume rest of line
                             
                             System.out.print("Enter the Employee ID: ");
-                            String emplID = scan.nextLine();
+                            while (!scan.hasNextInt()) { // validate input value
+                                System.out.print("Please enter a positive integer: ");
+                                scan.nextLine();
+                            }
+                            int emplID = scan.nextInt();
+                            scan.nextLine(); // consume rest of line
                             
                             System.out.print("Enter the Sales Value: ");
-                            String saleVal = scan.nextLine();
+                            while (!scan.hasNextBigDecimal()) { // validate input value
+                            	System.out.print("Please enter a valid salary: ");
+                                scan.nextLine();
+                            }
+                            BigDecimal saleVal = scan.nextBigDecimal();
+                            scan.nextLine(); // consume rest of line
                             
                             insertIntoOrderPartial.setString(1, orderNumber);
-                            insertIntoOrderPartial.setString(2, custID);
-                            insertIntoOrderPartial.setString(3, emplID);
-                            insertIntoOrderPartial.setString(4, saleVal);
+                            insertIntoOrderPartial.setInt(2, custID);
+                            insertIntoOrderPartial.setInt(3, emplID);
+                            insertIntoOrderPartial.setBigDecimal(4, saleVal);
                             insertIntoOrderPartial.executeUpdate();
                         } else if (userInput.equals("1")) {
                             // Print out all the Customers table
@@ -411,7 +469,7 @@ public class Application {
                                 System.out.print("Enter Employee ID Number: ");
                                 String userQueryID = scan.nextLine(); // prompt user for ID
                                 
-                                if (userInput.equalsIgnoreCase("a") ||
+                                if (userQueryID.equalsIgnoreCase("a") ||
                                         userInput.equalsIgnoreCase("all")) { // see all option
                                     
                                 }
@@ -430,7 +488,7 @@ public class Application {
                                 System.out.print("Enter Employee ID Number: ");
                                 userQueryID = scan.nextLine(); // prompt user for ID
                                 
-                                if (userInput.equalsIgnoreCase("a") ||
+                                if (userQueryID.equalsIgnoreCase("a") ||
                                         userInput.equalsIgnoreCase("all")) { // see all option
                                     selectEmployeeWhere.setInt(1, Integer.parseInt(userQueryID));
                                     rs = selectEmployeeWhere.executeQuery();
@@ -440,7 +498,7 @@ public class Application {
                                             + rs.getString("LastName") + ", " + rs.getString("FirstName"));
                                     }
                                     System.out.println("");
-                                } else if (userInput.matches("\\d+")) { // valid ID format
+                                } else if (userQueryID.matches("\\d+")) { // valid ID format
                                     selectEmployeeWhere.setInt(1, Integer.parseInt(userQueryID));
                                     rs = selectEmployeeWhere.executeQuery();
                                     
@@ -475,7 +533,12 @@ public class Application {
                                                 switch (userInput) {
                                                     case "1":
                                                         System.out.print("Employee ID: ");
+                                                        while (!scan.hasNextInt()) { // validate input value
+                                                            System.out.print("Please enter a positive integer: ");
+                                                            scan.nextLine();
+                                                        }
                                                         employeeID = scan.nextInt();
+                                                        scan.nextLine(); // consume rest of line
                                                         updateEmployee = HRConn.prepareStatement(
                                                             "UPDATE Employee SET EmployeeID = ? " +
                                                             "WHERE EmployeeID = ?"
@@ -509,7 +572,12 @@ public class Application {
                                                         break;
                                                     case "4":
                                                         System.out.print("SSN: ");
+                                                        while (!scan.hasNextInt()) { // validate input value
+                                                            System.out.print("Please enter a SSN (without dashes): ");
+                                                            scan.nextLine();
+                                                        }
                                                         SSN = scan.nextInt();
+                                                        scan.nextLine(); // consume rest of line
                                                         updateEmployee = HRConn.prepareStatement(
                                                             "UPDATE Employee SET SSN = ? " +
                                                             "WHERE EmployeeID = ?"
@@ -520,7 +588,12 @@ public class Application {
                                                         break;
                                                     case "5":
                                                         System.out.print("Salary: ");
+                                                        while (!scan.hasNextBigDecimal()) { // validate input value
+                                                            System.out.print("Please enter a valid salary: ");
+                                                            scan.nextLine();
+                                                        }
                                                         salary = scan.nextBigDecimal();
+                                                        scan.nextLine(); // consume rest of line
                                                         updateEmployee = HRConn.prepareStatement(
                                                             "UPDATE Employee SET Salary = ? " +
                                                             "WHERE EmployeeID = ?"
@@ -532,6 +605,16 @@ public class Application {
                                                     case "6":
                                                         System.out.print("Pay Type (Hourly/Yearly): ");
                                                         payType = scan.nextLine();
+                                                        while (!payType.equals("Hourly") && !payType.equals("Yearly")) { // validate input value
+                                                            if (payType.equalsIgnoreCase("Hourly")) { // Fix value (CaseSensitive)
+                                                                payType = "Hourly";
+                                                            } else if (payType.equalsIgnoreCase("Yearly")) {
+                                                            	payType = "Yearly";
+                                                            } else { // invalid entry
+                                                            	System.out.print("Please enter a valid Pay Type (Hourly or Yearly): ");
+                                                            	payType = scan.nextLine();
+                                                            }
+                                                        }
                                                         updateEmployee = HRConn.prepareStatement(
                                                             "UPDATE Employee SET PayType = ? " +
                                                             "WHERE EmployeeID = ?"
@@ -543,6 +626,22 @@ public class Application {
                                                     case "7":
                                                         System.out.print("Job Type (Admin, Sales, HR, or Engineer): ");
                                                         jobType = scan.nextLine();
+                                                        while (!jobType.equals("Admin") && !jobType.equals("Engineer")
+                                                        		&& !jobType.equals("HR") && !jobType.equals("Sales")) { // validate input value
+                                                            if (jobType.equalsIgnoreCase("Admin")) { // Fix value (CaseSensitive)
+                                                            	jobType = "Admin";
+                                                            } else if (jobType.equalsIgnoreCase("Engineer")) {
+                                                            	jobType = "Engineer";
+                                                            } else if (jobType.equalsIgnoreCase("HR")) {
+                                                            	jobType = "HR";
+                                                            } else if (jobType.equalsIgnoreCase("Sales")) {
+                                                            	jobType = "Sales";
+                                                            } else {
+                                                            	System.out.print("Please enter a valid Job Type " 
+                                                            			+ "(Admin, Engineer, HR, Sales): ");
+                                                            	jobType = scan.nextLine();
+                                                            }
+                                                        }
                                                         updateEmployee = HRConn.prepareStatement(
                                                             "UPDATE Employee SET JobType = ? " +
                                                             "WHERE EmployeeID = ?"
@@ -560,8 +659,8 @@ public class Application {
                                         }
                                     }
                                     System.out.println("");
-                                } else if (!userInput.equalsIgnoreCase("q") &&
-                                           !userInput.equalsIgnoreCase("quit")) { // invalid ID format
+                                } else if (!userQueryID.equalsIgnoreCase("q") &&
+                                           !userQueryID.equalsIgnoreCase("quit")) { // invalid ID format
                                     System.out.println("Invalid Employee ID. Please enter a positive integer value.\n");
                                 }
                             } while (!userInput.equalsIgnoreCase("q") &&
