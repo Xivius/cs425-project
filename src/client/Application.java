@@ -82,12 +82,15 @@ public class Application {
             PreparedStatement selectEmployeeWhere = conn.prepareStatement(
                 "SELECT * FROM Employee WHERE EmployeeID = ?"
             );
-            PreparedStatement createNewEmployee = conn.prepareStatement(
+            PreparedStatement insertIntoLogin = conn.prepareStatement(
                 "INSERT INTO Login (UserID, Password, Privilege) VALUES (?,?,?)"
             );
-            PreparedStatement createOrder = conn.prepareStatement(
+            PreparedStatement insertIntoOrderFull = conn.prepareStatement(
                 "INSERT INTO SalesOrder (OrderNumber, CustomerID, EmployeeId, SalesValue, ItemID, ModelNumber) VALUES (?,?,?,?,?,?)"
             );
+            PreparedStatement insertIntoOrderPartial = conn.prepareStatement(
+                    "INSERT INTO SalesOrder (OrderNumber, CustomerID, EmployeeID, SalesValue) VALUES (?,?,?,?)"
+                );
             PreparedStatement insertIntoEmployee = conn.prepareStatement(
                 "INSERT INTO Employee (EmployeeID, FirstName, LastName, SSN, Salary, PayType, JobType) VALUES (?,?,?,?,?,?,?)"
             );
@@ -99,9 +102,6 @@ public class Application {
             );
             PreparedStatement insertIntoModel = conn.prepareStatement(
                 "INSERT INTO Model (ModelNumber, SalesPrice) VALUES (?,?)"
-            );
-            PreparedStatement insertIntoOrder = conn.prepareStatement(
-                "INSERT INTO SalesOrder (OrderNumber, CustomerID, EmployeeID, SalesValue) VALUES (?,?,?,?)"
             );
             PreparedStatement grantRoleToEmployee = conn.prepareStatement(
                 "GRANT ? TO ?"
@@ -121,6 +121,7 @@ public class Application {
             // Booleans for while loops
             boolean authenticated, done, exitApplication;
             
+            // Keep Application alive as long as User doesn't want to exit it
             do {
                 // Reset looping conditions
                 authenticated = false;
@@ -135,6 +136,10 @@ public class Application {
                 do {
                     // Stay in loop while there are no matches for username and password
                     System.out.print("Username: ");
+                    while (!scan.hasNextInt()) {
+                    	System.out.print("Please enter a positive integer: ");
+                    	scan.nextLine();
+                    }
                     userID = scan.nextInt();
                     scan.nextLine(); // consume rest of line
                     System.out.print("Password: ");
@@ -160,7 +165,6 @@ public class Application {
                     }
                 } while (!authenticated);
                 
-                done = false; // reset done variable (used to break out of while loops)
                 // Create while loops for each privilege (type of user):
                 if (privilege.equalsIgnoreCase("admin")) {
                     while (!done) {
@@ -288,10 +292,10 @@ public class Application {
                             newPass = scan.nextLine();
                             System.out.println("Privilege: " + jobType);
                             
-                            createNewEmployee.setInt(1, employeeID);
-                            createNewEmployee.setString(2, newPass);
-                            createNewEmployee.setString(3, jobType);
-                            createNewEmployee.executeUpdate();
+                            insertIntoLogin.setInt(1, employeeID);
+                            insertIntoLogin.setString(2, newPass);
+                            insertIntoLogin.setString(3, jobType);
+                            insertIntoLogin.executeUpdate();
                         } else {
                             System.out.println("Invalid Option.");
                         }
@@ -325,21 +329,20 @@ public class Application {
                             System.out.print("Enter the Sales Value: ");
                             String saleVal = scan.nextLine();
                             
-                            insertIntoOrder.setString(1, orderNumber);
-                            insertIntoOrder.setString(2, custID);
-                            insertIntoOrder.setString(3, emplID);
-                            insertIntoOrder.setString(4, saleVal);
-                            insertIntoOrder.executeUpdate();
+                            insertIntoOrderPartial.setString(1, orderNumber);
+                            insertIntoOrderPartial.setString(2, custID);
+                            insertIntoOrderPartial.setString(3, emplID);
+                            insertIntoOrderPartial.setString(4, saleVal);
+                            insertIntoOrderPartial.executeUpdate();
                         } else if (userInput.equals("1")) {
                             // Print out all the Customers table
-                            // Let the user run SQL to edit the table
-                            
                             System.out.println("Here is the Customers table:");
                             rs = stmt.executeQuery(selectCustomer);
                             while (rs.next()) {
                                 System.out.println(rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3));
                             }
                             
+                            // Let the user run SQL to edit the table
                             while (true) {
                                 System.out.println("Input update SQL statement. Press ENTER (empty string) to stop.");
                                 String admin_statement = scan.nextLine();
