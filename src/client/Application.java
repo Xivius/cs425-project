@@ -228,7 +228,6 @@ public class Application {
                             System.out.println("Enter table name:");
                             String tname = scan.nextLine();
                             
-                            ResultSet rset = null;
                             switch(tname) {
                                 case "Login":
                                     rset = stmt.executeQuery(selectLogin);
@@ -390,17 +389,17 @@ public class Application {
                             System.out.println("(3) Total parts in inventory");
                             System.out.print("What would you like to do? (Type number): ");
                             String userRNum = scan.nextLine();
-                            if (userInput.equals("1")) {
+                            if (userRNum.equals("1")) {
                                 rset = stmt.executeQuery(totalRevenueReport);
                                 while (rset.next()) {
                                     System.out.println(rset.getString(1)+" "+rset.getString(2));
                                 }
-                            } else if (userInput.equals("2")) {
+                            } else if (userRNum.equals("2")) {
                                 rset = stmt.executeQuery(modelNumbersBoughtReport);
                                 while (rset.next()) {
                                     System.out.println(rset.getString(1)+" "+rset.getString(2));
                                 }
-                            } else if (userInput.equals("3")) {
+                            } else if (userRNum.equals("3")) {
                                 rset = stmt.executeQuery(partsInInventoryReport);
                                 while (rset.next()) {
                                     System.out.println(rset.getString(1)+" "+rset.getString(2));
