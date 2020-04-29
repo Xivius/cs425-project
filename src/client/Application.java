@@ -70,6 +70,11 @@ public class Application {
             Statement HRStmt = HRConn.createStatement();
             Statement salesStmt = salesConn.createStatement();
             
+            // Report queries
+            String totalRevenueReport = "SELECT sum(SalesValue), EmployeeID FROM Order GROUP BY EmployeeID";
+            String modelNumbersBoughtReport = "SELECT ModelNumber, count(ModelNumber) FROM Order_Details GROUP BY ModelNumber";
+            String partsInInventoryReport = "SELECT ItemID, count(ItemID) FROM Inventory GROUP BY ItemID";
+            
             // Strings for Simple SQL Queries
             String selectLogin = "SELECT * FROM Login";
             String selectEmployee = "SELECT * FROM Employee";
