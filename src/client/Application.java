@@ -109,7 +109,7 @@ public class Application {
                 "INSERT INTO Model (ModelNumber, SalesPrice) VALUES (?,?)"
             );
             PreparedStatement grantRoleToEmployee = conn.prepareStatement(
-                "GRANT ? TO ?"
+                "UPDATE Login SET Privilege = ? WHERE UserID = ?"
             );
             
             // ResultSet to hold data for Queries
@@ -174,7 +174,7 @@ public class Application {
                 // Create while loops for each privilege (type of user):
                 if (privilege.equalsIgnoreCase("admin")) {
                     while (!done) {
-                        System.out.println("Options:");
+                        System.out.println("\nOptions:");
                         System.out.println("(1) Create a new Employee");
                         System.out.println("(2) View/Update a table");
                         System.out.println("(3) Grant access to an Employee");
@@ -186,6 +186,7 @@ public class Application {
                         // For each option, write the code to satisfy it.
                         if (userInput.equals("5")) {
                             done = true;
+                            System.out.println(""); // print extra line for readability
                         } else if (userInput.equals("4")) {
                             // Analytics options shown. After selection, they query is executed and results printed.
                             System.out.println("Available report options:");
@@ -213,19 +214,42 @@ public class Application {
                         } else if (userInput.equals("3")) {
                             // Ask for EmployeeID, and the permission, plug those values into the grantRole prepared statement, then exectue.
                             System.out.print("Enter EmployeeID of person to grant: ");
-                            String employeeGrant = scan.nextLine();
-                            int empID = Integer.parseInt(employeeGrant);
-                            System.out.print("Enter privilege to be granted (Admin, HR, Sales, Engineering): ");
+                            while (!scan.hasNextInt()) { // validate input value
+                                System.out.print("Please enter a positive integer: ");
+                                scan.nextLine();
+                            }
+                            int empID = scan.nextInt();
+                            scan.nextLine(); // consume rest of line
+                            System.out.print("Enter privilege to be granted (Admin, HR, Sales, Engineering, None): ");
                             String employeePrivilege = scan.nextLine();
+                            while (!employeePrivilege.equals("Admin") && !employeePrivilege.equals("Engineer")
+                            		&& !employeePrivilege.equals("HR") && !employeePrivilege.equals("Sales")) { // validate input value
+                                if (employeePrivilege.equalsIgnoreCase("Admin")) { // Fix value (CaseSensitive)
+                                	employeePrivilege = "Admin";
+                                } else if (employeePrivilege.equalsIgnoreCase("Engineer")) {
+                                	employeePrivilege = "Engineer";
+                                } else if (employeePrivilege.equalsIgnoreCase("HR")) {
+                                	employeePrivilege = "HR";
+                                } else if (employeePrivilege.equalsIgnoreCase("Sales")) {
+                                	employeePrivilege = "Sales";
+                                } else if (employeePrivilege.equalsIgnoreCase("None")) {
+                                	employeePrivilege = "NULL";
+                                	break;
+                                } else {
+                                	System.out.print("Please enter a valid Job Type " 
+                                			+ "(Admin, Engineer, HR, Sales): ");
+                                	employeePrivilege = scan.nextLine();
+                                }
+                            }
                             
+                            grantRoleToEmployee.setString(1, employeePrivilege);
                             grantRoleToEmployee.setInt(2, empID);
                             grantRoleToEmployee.executeUpdate();
-                            
                         } else if (userInput.equals("2")) {
                             // User names a table, and it is printed.
                             // Then, the user may enter some SQL to update any table.
                             
-                            System.out.println("Enter table name:");
+                            System.out.print("Enter table name: ");
                             String tname = scan.nextLine();
                             
                             switch(tname) {
@@ -238,7 +262,7 @@ public class Application {
                                 case "Employee":
                                     rset = stmt.executeQuery(selectEmployee);
                                     while (rset.next()) {
-                                        System.out.println(rset.getString(1)+" "+rset.getString(2)+" "+rset.getString(3)+" "+rset.getString(4)+rset.getString(5)+" "+rset.getString(6)+" "+rset.getString(7));
+                                        System.out.println(rset.getString(1)+" "+rset.getString(2)+" "+rset.getString(3)+" "+rset.getString(4)+" "+rset.getString(5)+" "+rset.getString(6)+" "+rset.getString(7));
                                     }
                                     break;
                                 case "Inventory":
@@ -279,13 +303,29 @@ public class Application {
                                 }
                             }
                         } else if (userInput.equals("1")) {
-                            System.out.println("Options:");
+                            System.out.println("\nOptions:");
                             System.out.println("(1) Admin");
                             System.out.println("(2) Sales");
                             System.out.println("(3) Engineer");
                             System.out.println("(4) HR");
                             System.out.print("User Type (Type the number): ");
                             String employeeType = scan.nextLine();
+                            while (!employeeType.equals("Admin") && !employeeType.equals("Engineer")
+                            		&& !employeeType.equals("HR") && !employeeType.equals("Sales")) { // validate input value
+                                if (employeeType.equalsIgnoreCase("Admin")) { // Fix value (CaseSensitive)
+                                	employeeType = "Admin";
+                                } else if (employeeType.equalsIgnoreCase("Engineer")) {
+                                	employeeType = "Engineer";
+                                } else if (employeeType.equalsIgnoreCase("HR")) {
+                                	employeeType = "HR";
+                                } else if (employeeType.equalsIgnoreCase("Sales")) {
+                                	employeeType = "Sales";
+                                } else {
+                                	System.out.print("Please enter a valid Job Type " 
+                                			+ "(Admin, Engineer, HR, Sales): ");
+                                	employeeType = scan.nextLine();
+                                }
+                            }
                             
                             String firstName, lastName, payType, jobType, newPass;
                             BigDecimal salary = null;
@@ -370,7 +410,7 @@ public class Application {
                     }
                 } else if (privilege.equalsIgnoreCase("sales")) {
                     while (!done) {
-                        System.out.println("Options:");
+                        System.out.println("\nOptions:");
                         System.out.println("(1) View/update a Customer");
                         System.out.println("(2) Create an Order");
                         System.out.println("(3) Access sales, and other reports");
@@ -381,6 +421,7 @@ public class Application {
                         // For each option, write the code to satisfy it.
                         if (userInput.equals("4")) {
                             done = true;
+                            System.out.println(""); // print extra line for readability
                         } else if (userInput.equals("3")) {
                             // Analytics options shown. After selection, they query is executed and results printed.
                             System.out.println("Available report options:");
@@ -462,7 +503,7 @@ public class Application {
                     }
                 } else if (privilege.equalsIgnoreCase("hr")) {
                     while (!done) {
-                        System.out.println("Options:");
+                        System.out.println("\nOptions:");
                         System.out.println("(1) View/update an Employee's information");
                         System.out.println("(2) View sales for an Employee");
                         System.out.println("(3) Logout");
@@ -472,6 +513,7 @@ public class Application {
                         // For each option, write the code to satisfy it.
                         if (userInput.equals("3")) {
                             done = true;
+                            System.out.println(""); // print extra line for readability
                         } else if (userInput.equals("2")) {
                             // TODO: Finish this section
                             PreparedStatement ps = HRConn.prepareStatement(
@@ -525,7 +567,7 @@ public class Application {
                                     if (!rs.next()) { // ID not found
                                         System.out.println("Sorry; there is no employee with ID " + userQueryID + ".");
                                     } else { // found an employee with matching ID
-                                        System.out.println(rs.toString()); // TODO: print all employee information
+                                    	System.out.println(rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3)+" "+rs.getString(4)+" "+rs.getString(5)+" "+rs.getString(6)+" "+rs.getString(7));
                                         System.out.print("Modify this information (y/n)? ");
                                         userInput = scan.nextLine();
                                         if (userInput.equalsIgnoreCase("y") || userInput.equalsIgnoreCase("yes")) {
@@ -538,7 +580,7 @@ public class Application {
                                             PreparedStatement updateEmployee = null;
                                             
                                             do {
-                                                System.out.println("Options: ");
+                                                System.out.println("\nOptions: ");
                                                 System.out.println("(1) Employee ID");
                                                 System.out.println("(2) First Name");
                                                 System.out.println("(3) Last Name");
@@ -691,7 +733,7 @@ public class Application {
                     }
                 } else if (privilege.equalsIgnoreCase("engineering")) {
                     while (!done) {
-                        System.out.println("Options:");
+                        System.out.println("\nOptions:");
                         System.out.println("(1) View/update the Inventory");
                         System.out.println("(2) View/update a Model");
                         System.out.println("(3) View Employee information");
@@ -702,6 +744,7 @@ public class Application {
                         // For each option, write the code to satisfy it.
                         if (userInput.equals("4")) {
                             done = true;
+                            System.out.println(""); // print extra line for readability
                         } else if (userInput.equals("3")) {
                             // FIXME: Need to write the code for each action
                         } else if (userInput.equals("2")) {
