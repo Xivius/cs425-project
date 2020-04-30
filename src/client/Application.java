@@ -102,7 +102,7 @@ public class Application {
             );
             PreparedStatement insertIntoInventory = conn.prepareStatement(
                 "INSERT INTO Inventory (ItemID, Cost, LeadTime, CategoryType, CategoryNumber) "
-                + "VALUES (?,?, INTERVAL '?' DAY,?,?)"
+                + "VALUES (?,?,INTERVAL '?' DAY,?,?)"
             );
             PreparedStatement insertIntoCustomer = conn.prepareStatement(
                 "INSERT INTO Customer (CustomerID, FirstName, LastName) VALUES (?,?,?)"
@@ -430,7 +430,12 @@ public class Application {
                         } else if (userInput.equals("2")) {
                             //(OrderNumber, CustomerID, EmployeeID, SalesValue)
                             System.out.print("Enter the order number: ");
-                            String orderNumber = scan.nextLine();
+                            while (!scan.hasNextInt()) { // validate input value
+                                System.out.print("Please enter a positive integer: ");
+                                scan.nextLine();
+                            }
+                            int orderNumber = scan.nextInt();
+                            scan.hasNextLine(); // consume rest of line
                             
                             System.out.print("Enter the Customer ID: ");
                             while (!scan.hasNextInt()) { // validate input value
@@ -456,14 +461,14 @@ public class Application {
                             BigDecimal saleVal = scan.nextBigDecimal();
                             scan.nextLine(); // consume rest of line
                             
-                            insertIntoOrderPartial.setString(1, orderNumber);
+                            insertIntoOrderPartial.setInt(1, orderNumber);
                             insertIntoOrderPartial.setInt(2, custID);
                             insertIntoOrderPartial.setInt(3, emplID);
                             insertIntoOrderPartial.setBigDecimal(4, saleVal);
                             insertIntoOrderPartial.executeUpdate();
                         } else if (userInput.equals("1")) {
                             // Print out all the Customers table
-                            System.out.println("Here is the Customers table:");
+                            System.out.println("Here is the Customer table:");
                             rs = stmt.executeQuery(selectCustomer);
                             while (rs.next()) {
                                 System.out.println(rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3));
@@ -476,7 +481,12 @@ public class Application {
                                 if (admin_statement.isEmpty()) {
                                     break;
                                 }
-                                stmt.executeUpdate(admin_statement);
+                                rset = stmt.executeQuery(admin_statement);
+                                while (rset.next()) {
+                                	for (int i = 0; i < rset.getFetchSize(); i++)
+                                		System.out.print(rset.getString(i) + " ");
+                                	System.out.println("");
+                                }
                             }
                         } else {
                             System.out.println("Invalid Option.");
