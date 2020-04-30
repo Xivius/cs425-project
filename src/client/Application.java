@@ -82,6 +82,7 @@ public class Application {
             String selectCustomer = "SELECT * FROM Customer";
             String selectModel = "SELECT * FROM Model";
             String selectOrder = "SELECT * FROM SalesOrder";
+            String selectEmployeeView = "SELECT * FROM EmployeeEngineerView";
             
             // Prepared statements that we might need.
             PreparedStatement selectEmployeeWhere = conn.prepareStatement(
@@ -695,13 +696,14 @@ public class Application {
                                         } while (!userInput.equals("8"));
                                     }
                                 }
-                                System.out.println("");
+                            } else {
+                            	System.out.println("Invalid ID format.");
                             }
                         } else {
                             System.out.println("Invalid Option.");
                         }
                     }
-                } else if (privilege.equalsIgnoreCase("engineering")) {
+                } else if (privilege.equalsIgnoreCase("engineer")) {
                     while (!done) {
                         System.out.println("\nOptions:");
                         System.out.println("(1) View/update the Inventory");
@@ -716,11 +718,218 @@ public class Application {
                             done = true;
                             System.out.println(""); // print extra line for readability
                         } else if (userInput.equals("3")) {
-                            // FIXME: Need to write the code for each action
+                        	System.out.println("\nOptions:");
+                        	System.out.println("(1) See All");
+                        	System.out.println("(2) Search for Specific Employee");
+                        	System.out.print("What would you like to do? (Type number): ");
+                        	String answer = scan.nextLine();
+                        	
+                        	PreparedStatement selectEmployeeViewWhere = null;
+                        	
+                        	switch (answer) {
+                        		case "1":
+                        			System.out.println("\nEmployees:");
+                                    rs = engineerStmt.executeQuery(selectEmployeeView);
+                                    while (rs.next()) {
+                                    	System.out.println(rs.getInt(1) + " " + rs.getBigDecimal(2));
+                                    }
+                        			break;
+                        		case "2":
+                        			System.out.print("Enter Employee ID: ");
+                        			while (!scan.hasNextInt()) { // validate input value
+    	                                System.out.print("Please enter a positive integer: ");
+    	                                scan.nextLine();
+    	                            }
+                        			int emplID = scan.nextInt();
+                        			scan.nextLine(); // consume rest of line
+                        			
+                        			selectEmployeeViewWhere = engineerConn.prepareStatement(
+                        					"SELECT * FROM EmployeeEngineerView WHERE EmployeeID = ?");
+                        			selectEmployeeViewWhere.setInt(1, emplID);
+                        			rset = selectEmployeeViewWhere.executeQuery();
+                        			System.out.println(rset.getInt(1) + ": " + rset.getString(2) + " " 
+                        					+ rset.getString(3) + "; " + rset.getString(4));
+                        			break;
+                        		default:
+                        			System.out.println("Invalid Option.");
+                        	}
                         } else if (userInput.equals("2")) {
-                            // FIXME: Need to write the code for each action
+                            System.out.println("\nModel Table:");
+                            rs = engineerStmt.executeQuery(selectModel);
+                            while (rs.next()) {
+                            	System.out.println(rs.getInt(1) + " " + rs.getBigDecimal(2));
+                            }
+                            
+                            System.out.print("\nModify Inventory Entry (y/n)? ");
+                            String answer = scan.nextLine();
+                            
+                            if (answer.equalsIgnoreCase("y") || answer.equalsIgnoreCase("yes")) {
+	                            System.out.print("Enter Model Number of entry to modify: ");
+	                            while (!scan.hasNextInt()) { // validate input value
+	                                System.out.print("Please enter a positive integer: ");
+	                                scan.nextLine();
+	                            }
+	                            int modelNumber = scan.nextInt();
+	                            scan.nextLine(); // consume rest of line
+	                            
+	                            PreparedStatement updateModel = null;
+	                            String userAnswer = "";
+	                            
+	                            do {
+	                            	System.out.println("\nOptions:");
+	                            	System.out.println("(1) Model Number");
+	                            	System.out.println("(2) Sales Price");
+	                            	System.out.println("(3) Quit");
+	                            	System.out.print("Which field to modify? (Type number): ");
+	                            	userAnswer = scan.nextLine();
+	                            	
+	                            	switch (userAnswer) {
+		                            	case "1":
+		                            		System.out.print("Model Number: ");
+		                            		while (!scan.hasNextInt()) { // validate input value
+		    	                                System.out.print("Please enter a positive integer: ");
+		    	                                scan.nextLine();
+		    	                            }
+		                            		int newModelNumber = scan.nextInt();
+		                            		scan.nextLine(); // consume rest of line
+		                            		
+		                            		updateModel = engineerConn.prepareStatement(
+		                            			"UPDATE Model SET ModelNumber = ? WHERE ModelNumber = ?");
+		                            		updateModel.setInt(1, newModelNumber);
+		                            		updateModel.setInt(2, modelNumber);
+		                            		updateModel.executeUpdate();
+		                            		modelNumber = newModelNumber;
+		                            		break;
+		                            	case "2":
+		                            		System.out.print("Sales Price: ");
+		                            		while (!scan.hasNextBigDecimal()) { // validate input value
+		                                        System.out.print("Please enter a valid dollar amount: ");
+		                                        scan.nextLine();
+		                                    }
+		                            		BigDecimal salesPrice = scan.nextBigDecimal();
+		                            		scan.nextLine(); // consume rest of line
+		                            		
+		                            		updateModel = engineerConn.prepareStatement(
+		                            			"UPDATE Model SET SalesPrice = ? WHERE ModelNumber = ?");
+		                            		updateModel.setBigDecimal(1, salesPrice);
+		                            		updateModel.setInt(2, modelNumber);
+		                            		updateModel.executeUpdate();
+		                            		break;
+		                            	case "3":
+		                            		break;
+	                            		default:
+	                            			System.out.println("Invalid field option.");
+	                            			break;
+	                            	}
+	                            } while (!userAnswer.equals("3"));
+                            }
                         } else if (userInput.equals("1")) {
-                            // FIXME: Need to write the code for each action
+                        	System.out.println("\nInventory Table:");
+                            rs = engineerStmt.executeQuery(selectInventory);
+                            while (rs.next()) {
+                            	System.out.println(rs.getInt(1) + " " + rs.getBigDecimal(2) + " " + rs.getString(3) + " " + rs.getString(4) + " " + rs.getInt(5));
+                            }
+                            
+                            System.out.print("\nModify Inventory Entry (y/n)? ");
+                            String answer = scan.nextLine();
+                            if (answer.equalsIgnoreCase("y") || answer.equalsIgnoreCase("yes")) {
+	                            System.out.print("Enter Item ID of entry to modify: ");
+	                            while (!scan.hasNextInt()) { // validate input value
+	                                System.out.print("Please enter a positive integer: ");
+	                                scan.nextLine();
+	                            }
+	                            int itemID = scan.nextInt();
+	                            scan.nextLine(); // consume rest of line
+	                            
+	                            PreparedStatement updateInventory = null;
+	                            String userAnswer = "";
+	                            
+	                            do {
+	                            	System.out.println("\nOptions:");
+	                            	System.out.println("(1) Item ID");
+	                            	System.out.println("(2) Cost");
+	                            	System.out.println("(3) Lead Time");
+	                            	System.out.println("(4) Category Type");
+	                            	System.out.println("(5) Category Number");
+	                            	System.out.println("(6) Quit");
+	                            	System.out.print("Which field to modify? (Type number): ");
+	                            	userAnswer = scan.nextLine();
+	                            	
+	                            	switch (userAnswer) {
+		                            	case "1":
+		                            		System.out.print("Item ID: ");
+		                            		while (!scan.hasNextInt()) { // validate input value
+		    	                                System.out.print("Please enter a positive integer: ");
+		    	                                scan.nextLine();
+		    	                            }
+		                            		int newItemID = scan.nextInt();
+		                            		scan.nextLine(); // consume rest of line
+		                            		
+		                            		updateInventory = engineerConn.prepareStatement(
+		                            			"UPDATE Inventory SET ItemID = ? WHERE ItemID = ?");
+		                            		updateInventory.setInt(1, newItemID);
+		                            		updateInventory.setInt(2, itemID);
+		                            		updateInventory.executeUpdate();
+		                            		itemID = newItemID;
+		                            		break;
+		                            	case "2":
+		                            		System.out.print("Cost: ");
+		                            		while (!scan.hasNextBigDecimal()) { // validate input value
+		                                        System.out.print("Please enter a valid cost: ");
+		                                        scan.nextLine();
+		                                    }
+		                            		BigDecimal cost = scan.nextBigDecimal();
+		                            		scan.nextLine(); // consume rest of line
+		                            		
+		                            		updateInventory = engineerConn.prepareStatement(
+		                            			"UPDATE Inventory SET Cost = ? WHERE ItemID = ?");
+		                            		updateInventory.setBigDecimal(1, cost);
+		                            		updateInventory.setInt(2, itemID);
+		                            		updateInventory.executeUpdate();
+		                            		break;
+		                            	case "3":
+		                            		System.out.print("LeadTime: ");
+		                            		String leadTime = scan.nextLine();
+		                            		
+		                            		updateInventory = engineerConn.prepareStatement(
+		                            			"UPDATE Inventory SET LeadTime = ? WHERE ItemID = ?");
+		                            		updateInventory.setString(1, leadTime);
+		                            		updateInventory.setInt(2, itemID);
+		                            		updateInventory.executeUpdate();
+		                            		break;
+		                            	case "4":
+		                            		System.out.print("Category Type: ");
+		                            		String categoryType = scan.nextLine();
+		                            		
+		                            		updateInventory = engineerConn.prepareStatement(
+		                            			"UPDATE Inventory SET CategoryType = ? WHERE ItemID = ?");
+		                            		updateInventory.setString(1, categoryType);
+		                            		updateInventory.setInt(2, itemID);
+		                            		updateInventory.executeUpdate();
+		                            		break;
+		                            	case "5":
+		                            		System.out.print("Category Number: ");
+		                            		while (!scan.hasNextInt()) { // validate input value
+		    	                                System.out.print("Please enter a positive integer: ");
+		    	                                scan.nextLine();
+		    	                            }
+		                            		int categoryNumber = scan.nextInt();
+		                            		scan.nextLine(); // consume rest of line
+		                            		
+		                            		updateInventory = engineerConn.prepareStatement(
+		                            			"UPDATE Inventory SET CategoryNumber = ? WHERE ItemID = ?");
+		                            		updateInventory.setInt(1, categoryNumber);
+		                            		updateInventory.setInt(2, itemID);
+		                            		updateInventory.executeUpdate();
+		                            		break;
+		                            	case "6":
+		                            		break;
+	                            		default:
+	                            			System.out.println("Invalid field option.");
+	                            			break;
+	                            	}
+	                            } while (!userAnswer.equals("6"));
+                            }
                         } else {
                             System.out.println("Invalid Option.");
                         }
