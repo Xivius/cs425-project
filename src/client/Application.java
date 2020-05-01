@@ -71,9 +71,9 @@ public class Application {
             Statement salesStmt = salesConn.createStatement();
             
             // Report queries
-            String totalRevenueReport = "SELECT EmployeeID, sum(SalesValue) FROM SalesOrder GROUP BY EmployeeID";
-            String modelNumbersBoughtReport = "SELECT ModelNumber, count(ModelNumber) FROM Order_Details GROUP BY ModelNumber";
-            String partsInInventoryReport = "SELECT ItemID, count(ItemID) FROM Inventory GROUP BY ItemID";
+            String totalRevenueReport = "SELECT EmployeeID, SUM(SalesValue) FROM SalesOrder GROUP BY EmployeeID ORDER BY EmployeeID";
+            String modelNumbersBoughtReport = "SELECT ModelNumber, COUNT(ModelNumber) FROM Order_Details GROUP BY ModelNumber ORDER BY ModelNumber";
+            String partsInInventoryReport = "SELECT ItemID, SUM(CategoryNumber) FROM Inventory GROUP BY ItemID ORDER BY itemID";
             
             // Strings for Simple SQL Queries
             String selectLogin = "SELECT * FROM Login";
@@ -94,9 +94,12 @@ public class Application {
             PreparedStatement insertIntoOrderFull = conn.prepareStatement(
                 "INSERT INTO SalesOrder (OrderNumber, CustomerID, EmployeeId, SalesValue, ItemID, ModelNumber) VALUES (?,?,?,?,?,?)"
             );
+            PreparedStatement insertIntoOrderDetails= conn.prepareStatement(
+                    "INSERT INTO Order_Details (OrderNumber, ItemID, ModelNumber) VALUES (?,?,?)"
+            );
             PreparedStatement insertIntoOrderPartial = conn.prepareStatement(
                     "INSERT INTO SalesOrder (OrderNumber, CustomerID, EmployeeID, SalesValue) VALUES (?,?,?,?)"
-                );
+            );
             PreparedStatement insertIntoEmployee = conn.prepareStatement(
                 "INSERT INTO Employee (EmployeeID, FirstName, LastName, SSN, Salary, PayType, JobType) VALUES (?,?,?,?,?,?,?)"
             );
@@ -466,6 +469,28 @@ public class Application {
                             insertIntoOrderPartial.setInt(3, emplID);
                             insertIntoOrderPartial.setBigDecimal(4, saleVal);
                             insertIntoOrderPartial.executeUpdate();
+                            
+                            System.out.print("Enter Item ID (Inventory's Item): ");
+                            while (!scan.hasNextInt()) { // validate input value
+                                System.out.print("Please enter a positive integer: ");
+                                scan.nextLine();
+                            }
+                            int itemID = scan.nextInt();
+                            scan.nextLine(); // consume rest of line
+                            
+                            System.out.print("Enter Model Number (Order's Model): ");
+                            while (!scan.hasNextInt()) { // validate input value
+                                System.out.print("Please enter a positive integer: ");
+                                scan.nextLine();
+                            }
+                            int modelNumber = scan.nextInt();
+                            scan.nextLine(); // consume rest of line
+                            
+                            insertIntoOrderDetails.setInt(1, orderNumber);
+                            insertIntoOrderDetails.setInt(2, itemID);
+                            insertIntoOrderDetails.setInt(3, modelNumber);
+                            insertIntoOrderDetails.execute();
+                            
                         } else if (userInput.equals("1")) {
                             // Print out all the Customers table
                             System.out.println("Here is the Customer table:");
